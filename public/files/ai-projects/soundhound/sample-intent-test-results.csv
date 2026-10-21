@@ -1,0 +1,3 @@
+intent,utterances_tested,pass_rate
+schedule_appointment,50,0.00
+cancel_appointment,50,0.00

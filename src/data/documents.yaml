@@ -1,0 +1,98 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Cloud Telephony Resource Hub — every document and link on the site.
+#
+# To add a document:
+#   1. Put the file in the matching folder under public/files/
+#   2. Copy one entry below, paste it at the TOP of its section, and edit it.
+#   3. Run `npm run build`. If anything is wrong, the build tells you what and where.
+#
+# Fields
+#   title        required
+#   description  required, 200 characters max
+#   section      required: practice-info | ai-projects | power-bi
+#   subsection   ai-projects ONLY: soundhound | sierra | iva-studio  (leave out for other sections)
+#   file         path under public/files/ — e.g. power-bi/q3-report.pdf   ┐ use exactly
+#   url          full https:// link, for external pages/spreadsheets        ┘ ONE of these
+#   dateAdded    required, YYYY-MM-DD
+#   owner        optional, defaults to "Pete"
+#   tags         optional, e.g. [reporting, call-volume]
+#
+# Supported file types: PDF, DOCX, DOC, XLSX, XLS, CSV, PPTX
+# Entries marked "SAMPLE –" are placeholders. Delete them (and their files) when you add real content.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Practice Information (Business Leaders page) ───────────────────────────
+
+- title: "SAMPLE – Practice Onboarding Checklist"
+  description: "Steps for bringing a new practice onto the Cloud Telephony platform."
+  section: practice-info
+  file: practice-info/sample-onboarding-checklist.pdf
+  dateAdded: 2026-10-14
+  tags: [onboarding, checklist]
+
+- title: "SAMPLE – Practice Phone Directory"
+  description: "Main numbers for each practice, with notes."
+  section: practice-info
+  file: practice-info/sample-phone-directory.csv
+  dateAdded: 2026-10-02
+  tags: [directory, phone-numbers]
+
+- title: "SAMPLE – After-Hours Routing Policy"
+  description: "How calls are routed when a practice is closed."
+  section: practice-info
+  file: practice-info/sample-after-hours-routing.pdf
+  dateAdded: 2026-09-18
+  tags: [routing, policy]
+
+# ── AI Projects (Internal Engineers page) ──────────────────────────────────
+
+- title: "SAMPLE – SoundHound Pilot Overview"
+  description: "Placeholder overview document for the SoundHound subsection."
+  section: ai-projects
+  subsection: soundhound
+  file: ai-projects/soundhound/sample-pilot-overview.pdf
+  dateAdded: 2026-10-16
+  tags: [pilot, overview]
+
+- title: "SAMPLE – SoundHound Intent Test Results"
+  description: "Placeholder test results spreadsheet."
+  section: ai-projects
+  subsection: soundhound
+  file: ai-projects/soundhound/sample-intent-test-results.csv
+  dateAdded: 2026-09-30
+  tags: [testing, intents]
+
+- title: "SAMPLE – Sierra Kickoff Notes"
+  description: "Placeholder notes document for the Sierra subsection."
+  section: ai-projects
+  subsection: sierra
+  file: ai-projects/sierra/sample-kickoff-notes.pdf
+  dateAdded: 2026-10-08
+  owner: "Cloud Telephony"
+  tags: [kickoff, notes]
+
+# ── Power BI (Internal Engineers page) ─────────────────────────────────────
+
+- title: "SAMPLE – Q3 Call Volume Summary"
+  description: "Monthly call volume by practice, July–September."
+  section: power-bi
+  file: power-bi/sample-q3-call-volume.pdf
+  dateAdded: 2026-10-20
+  tags: [Reporting, "Call Volume"]
+
+- title: "SAMPLE – Abandon Rate by Practice"
+  description: "Abandoned-call rate per practice by month."
+  section: power-bi
+  file: power-bi/sample-abandon-rate.csv
+  dateAdded: 2026-10-10
+  tags: [reporting, abandon-rate]
+
+- title: "SAMPLE – Call Volume Tracker"
+  description: "Example link card pointing to an external spreadsheet."
+  section: power-bi
+  url: https://example.com/
+  dateAdded: 2026-10-05
+  tags: [reporting, tracker]
+
+# Videos are out of scope for now. Later they'll be hosted on an external
+# platform and embedded — never committed to this repo.

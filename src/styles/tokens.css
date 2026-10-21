@@ -1,0 +1,85 @@
+/*
+ * ─── Cloud Telephony color tokens ───────────────────────────────────────────
+ * Every color on the site comes from this file. To rebrand, change the values
+ * below (light theme first, then the dark theme block). Don't put colors anywhere else.
+ *
+ *   --color-bg             Page background
+ *   --color-surface        Background of panels and section bands (slightly off the page bg)
+ *   --color-surface-raised Background of cards and inputs
+ *   --color-border         Lines around cards, inputs and dividers
+ *   --color-text           Main body text and headings
+ *   --color-text-muted     Secondary text (dates, owners, descriptions, counts)
+ *   --color-accent         Brand/team accent: links, primary buttons, selected tags, focus ring
+ *   --color-accent-hover   Accent on hover/press
+ *   --color-on-accent      Text/icons placed ON the accent color (e.g. primary button label)
+ *   --color-accent-soft    Light tint of the accent: tag chips, today's row in the hours table
+ *   --color-on-accent-soft Text placed on --color-accent-soft
+ *   --color-badge-bg       File-type badge background (PDF, XLSX, Link…)
+ *   --color-badge-text     File-type badge text
+ *   --color-error          Error messages (e.g. "Enter a 10-digit number.")
+ *   --color-shadow         Card shadow color
+ *
+ * All text/background pairs must keep WCAG AA contrast (4.5:1 for body text)
+ * in BOTH themes. Check with any contrast checker after changing values.
+ */
+
+:root {
+	color-scheme: light;
+	--color-bg: #ffffff;
+	--color-surface: #f4f6f8;
+	--color-surface-raised: #ffffff;
+	--color-border: #d5dae1;
+	--color-text: #1a1f27;
+	--color-text-muted: #4b5563;
+	--color-accent: #1d5fbf;
+	--color-accent-hover: #164a96;
+	--color-on-accent: #ffffff;
+	--color-accent-soft: #e6eefa;
+	--color-on-accent-soft: #143f80;
+	--color-badge-bg: #e9ecf0;
+	--color-badge-text: #2b323c;
+	--color-error: #b42318;
+	--color-shadow: rgb(16 24 40 / 0.08);
+}
+
+/* Dark theme values. Used when the OS prefers dark (and the user hasn't picked light)… */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		color-scheme: dark;
+		--color-bg: #0f1318;
+		--color-surface: #161b22;
+		--color-surface-raised: #1c222b;
+		--color-border: #343d4a;
+		--color-text: #e8ecf1;
+		--color-text-muted: #a7b1bf;
+		--color-accent: #7cb0ff;
+		--color-accent-hover: #a6c9ff;
+		--color-on-accent: #0b1220;
+		--color-accent-soft: #1d2b44;
+		--color-on-accent-soft: #c9dcff;
+		--color-badge-bg: #262d38;
+		--color-badge-text: #d5dbe3;
+		--color-error: #ff8a80;
+		--color-shadow: rgb(0 0 0 / 0.4);
+	}
+}
+
+/* …or when the user picks dark with the toggle. Keep these values identical to the block above. */
+:root[data-theme='dark'] {
+	color-scheme: dark;
+	--color-bg: #0f1318;
+	--color-surface: #161b22;
+	--color-surface-raised: #1c222b;
+	--color-border: #343d4a;
+	--color-text: #e8ecf1;
+	--color-text-muted: #a7b1bf;
+	--color-accent: #7cb0ff;
+	--color-accent-hover: #a6c9ff;
+	--color-on-accent: #0b1220;
+	--color-accent-soft: #1d2b44;
+	--color-on-accent-soft: #c9dcff;
+	--color-badge-bg: #262d38;
+	--color-badge-text: #d5dbe3;
+	--color-error: #ff8a80;
+	--color-shadow: rgb(0 0 0 / 0.4);
+}

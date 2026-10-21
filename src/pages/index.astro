@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { formatDate, getDocuments, locationOf } from '../lib/documents';
+
+const recent = (await getDocuments()).slice(0, 5);
+
+const audiences = [
+	{
+		href: '/business-leaders/',
+		title: 'Business Leaders',
+		text: 'Practice information: look up a practice by phone number, and browse practice documents.',
+	},
+	{
+		href: '/internal-engineers/',
+		title: 'Internal Engineers',
+		text: 'AI project documents for SoundHound, Sierra and IVA Studio, plus Power BI reports and links.',
+	},
+];
+---
+
+<BaseLayout>
+	<div class="container page-header">
+		<h1>Cloud Telephony Resource Hub</h1>
+		<p>Documents, reports and tools from the Cloud Telephony team. Choose your area to get started.</p>
+	</div>
+
+	<div class="container">
+		<ul class="audiences">
+			{
+				audiences.map((a) => (
+					<li>
+						<a class="audience" href={a.href}>
+							<h2>{a.title}</h2>
+							<p>{a.text}</p>
+							<span class="go" aria-hidden="true">
+								Go to {a.title} →
+							</span>
+						</a>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+
+	<section class="container section recent" aria-labelledby="recent-heading">
+		<h2 id="recent-heading">Recently added</h2>
+		{
+			recent.length === 0 ? (
+				<p class="placeholder">Nothing here yet.</p>
+			) : (
+				<ol class="recent-list">
+					{recent.map((doc) => {
+						const where = locationOf(doc);
+						return (
+							<li>
+								<a href={where.href}>{doc.title}</a>
+								<span class="recent-meta">
+									<span class="badge">{doc.type}</span>
+									{where.label} · <time datetime={doc.dateAdded.toISOString().slice(0, 10)}>{formatDate(doc.dateAdded)}</time>
+								</span>
+							</li>
+						);
+					})}
+				</ol>
+			)
+		}
+	</section>
+</BaseLayout>
+
+<style>
+	.audiences {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+		gap: 1rem;
+		margin: 0 0 2.5rem;
+		padding: 0;
+		list-style: none;
+	}
+
+	.audience {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		padding: 1.75rem 1.5rem;
+		border: 1px solid var(--color-border);
+		border-radius: 0.75rem;
+		background: var(--color-surface);
+		color: var(--color-text);
+		text-decoration: none;
+		transition:
+			border-color 0.15s,
+			box-shadow 0.15s;
+	}
+
+	.audience:hover {
+		color: var(--color-text);
+		border-color: var(--color-accent);
+		box-shadow: 0 4px 14px var(--color-shadow);
+	}
+
+	.audience h2 {
+		color: var(--color-accent);
+	}
+
+	.audience p {
+		color: var(--color-text-muted);
+		flex: 1;
+	}
+
+	.go {
+		font-weight: 600;
+		color: var(--color-accent);
+	}
+
+	.recent-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.recent-list li {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 0.25rem 1rem;
+		padding: 0.8rem 0;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.recent-list a {
+		font-weight: 600;
+		overflow-wrap: anywhere;
+	}
+
+	.recent-meta {
+		display: inline-flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--color-text-muted);
+		font-size: 0.9rem;
+	}
+
+	.badge {
+		padding: 0.1rem 0.45rem;
+		border-radius: 0.3rem;
+		background: var(--color-badge-bg);
+		color: var(--color-badge-text);
+		font-weight: 700;
+		font-size: 0.75rem;
+	}
+</style>

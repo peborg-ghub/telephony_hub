@@ -1,0 +1,97 @@
+---
+// The initial theme is applied by an inline script in BaseLayout's <head> (prevents a flash).
+// This button only switches it and remembers the choice.
+---
+
+<button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false">
+	<svg class="icon-moon" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+		<path fill="currentColor" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+	</svg>
+	<svg class="icon-sun" aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+		<circle cx="12" cy="12" r="4.5" fill="currentColor"></circle>
+		<g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+			<path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+		</g>
+	</svg>
+	<span>Dark mode</span>
+</button>
+
+<script>
+	const KEY = 'ct-theme';
+	const root = document.documentElement;
+	const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+	function current(): 'light' | 'dark' {
+		const set = root.dataset.theme;
+		if (set === 'light' || set === 'dark') return set;
+		return media.matches ? 'dark' : 'light';
+	}
+
+	function sync() {
+		const dark = current() === 'dark';
+		document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
+			btn.setAttribute('aria-pressed', String(dark));
+		});
+	}
+
+	document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
+		btn.addEventListener('click', () => {
+			const next = current() === 'dark' ? 'light' : 'dark';
+			root.dataset.theme = next;
+			try {
+				localStorage.setItem(KEY, next);
+			} catch {
+				/* storage blocked — the choice still applies for this page view */
+			}
+			sync();
+		});
+	});
+
+	media.addEventListener('change', sync);
+	sync();
+</script>
+
+<style>
+	.theme-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		min-height: 2.5rem;
+		padding: 0.4rem 0.75rem;
+		border: 1px solid var(--color-border);
+		border-radius: 999px;
+		background: var(--color-surface-raised);
+		color: var(--color-text);
+		font: inherit;
+		font-size: 0.9rem;
+		cursor: pointer;
+		white-space: nowrap;
+	}
+
+	.theme-toggle:hover {
+		border-color: var(--color-accent);
+	}
+
+	.icon-sun {
+		display: none;
+	}
+
+	.theme-toggle[aria-pressed='true'] .icon-sun {
+		display: inline;
+	}
+
+	.theme-toggle[aria-pressed='true'] .icon-moon {
+		display: none;
+	}
+
+	@media (max-width: 30rem) {
+		.theme-toggle span {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip: rect(0 0 0 0);
+			white-space: nowrap;
+		}
+	}
+</style>

@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24"
+
+# Keep every path out of search engines, including PDFs and other files in /files/*.
+# The <meta name="robots"> tag only covers HTML pages; this header covers everything.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

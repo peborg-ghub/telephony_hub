@@ -1,0 +1,13 @@
+# Normalise line endings so Windows edits don't create noisy diffs.
+* text=auto eol=lf
+
+# Documents are binary — never touch their bytes.
+*.pdf  binary
+*.doc  binary
+*.docx binary
+*.xls  binary
+*.xlsx binary
+*.pptx binary
+*.png  binary
+*.jpg  binary
+*.ico  binary

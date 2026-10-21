@@ -1,0 +1,168 @@
+---
+import ExternalIcon from './ExternalIcon.astro';
+import { formatDate, type Doc } from '../lib/documents';
+
+interface Props {
+	doc: Doc;
+	headingLevel?: 3 | 4;
+}
+
+const { doc, headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h3' | 'h4';
+const fileName = doc.href.split('/').pop();
+const searchText = [doc.title, doc.description, ...doc.tags].join(' ').toLowerCase();
+const isoDate = doc.dateAdded.toISOString().slice(0, 10);
+---
+
+<li class="card" data-doc data-search={searchText} data-tags={doc.tags.join(' ')}>
+	<div class="meta-top">
+		<span class="badge">
+			{doc.type}{doc.size && <span class="size"> · {doc.size}</span>}
+		</span>
+		<time datetime={isoDate} class="date">Added {formatDate(doc.dateAdded)}</time>
+	</div>
+
+	<Heading class="title">{doc.title}</Heading>
+	<p class="description">{doc.description}</p>
+	<p class="owner">Owner: {doc.owner}</p>
+
+	{
+		doc.tags.length > 0 && (
+			<ul class="tags" aria-label="Tags">
+				{doc.tags.map((tag) => (
+					<li>
+						<button type="button" class="tag" data-tag-toggle={tag} aria-pressed="false">
+							<span class="visually-hidden">Filter by tag </span>
+							{tag}
+						</button>
+					</li>
+				))}
+			</ul>
+		)
+	}
+
+	<div class="actions">
+		{
+			doc.isLink ? (
+				<a class="btn" href={doc.href} target="_blank" rel="noopener noreferrer">
+					Open link <ExternalIcon />
+					<span class="visually-hidden">(opens in new tab)</span>
+				</a>
+			) : doc.type === 'PDF' ? (
+				<>
+					<a class="btn" href={doc.href} target="_blank" rel="noopener">
+						Open<span class="visually-hidden"> {doc.title} (opens in new tab)</span>
+					</a>
+					<a class="btn btn--secondary" href={doc.href} download={fileName}>
+						Download<span class="visually-hidden"> {doc.title}</span>
+					</a>
+				</>
+			) : (
+				<a class="btn" href={doc.href} download={fileName}>
+					Download<span class="visually-hidden"> {doc.title}</span>
+				</a>
+			)
+		}
+	</div>
+</li>
+
+<style>
+	.card {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding: 1.1rem 1.15rem 1.15rem;
+		background: var(--color-surface-raised);
+		border: 1px solid var(--color-border);
+		border-radius: 0.6rem;
+		box-shadow: 0 1px 3px var(--color-shadow);
+		min-width: 0;
+	}
+
+	.card[hidden] {
+		display: none;
+	}
+
+	.meta-top {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.35rem 0.75rem;
+		font-size: 0.85rem;
+	}
+
+	.badge {
+		display: inline-block;
+		padding: 0.15rem 0.5rem;
+		border-radius: 0.3rem;
+		background: var(--color-badge-bg);
+		color: var(--color-badge-text);
+		font-weight: 700;
+		font-size: 0.78rem;
+		letter-spacing: 0.03em;
+	}
+
+	.size {
+		font-weight: 500;
+	}
+
+	.date,
+	.owner {
+		color: var(--color-text-muted);
+	}
+
+	.title {
+		margin: 0.15rem 0 0;
+		font-size: 1.05rem;
+		overflow-wrap: anywhere;
+	}
+
+	.description {
+		margin: 0;
+		color: var(--color-text-muted);
+		font-size: 0.95rem;
+	}
+
+	.owner {
+		margin: 0;
+		font-size: 0.85rem;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+		margin: 0.15rem 0 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.tag {
+		padding: 0.2rem 0.6rem;
+		border: 1px solid transparent;
+		border-radius: 999px;
+		background: var(--color-accent-soft);
+		color: var(--color-on-accent-soft);
+		font: inherit;
+		font-size: 0.8rem;
+		cursor: pointer;
+	}
+
+	.tag:hover {
+		border-color: var(--color-accent);
+	}
+
+	.tag[aria-pressed='true'] {
+		background: var(--color-accent);
+		color: var(--color-on-accent);
+	}
+
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: auto;
+		padding-top: 0.5rem;
+	}
+</style>

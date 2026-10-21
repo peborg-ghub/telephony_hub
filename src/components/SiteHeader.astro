@@ -1,0 +1,113 @@
+---
+import Logo from './Logo.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { NAV_LINKS } from '../lib/site';
+
+const path = Astro.url.pathname.replace(/\/?$/, '/');
+---
+
+<header class="site-header">
+	<div class="container bar">
+		<Logo />
+		<nav aria-label="Main">
+			<ul>
+				{
+					NAV_LINKS.map((link) => (
+						<li>
+							<a href={link.href} aria-current={path === link.href ? 'page' : undefined}>
+								{link.label}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+		<div class="toggle">
+			<ThemeToggle />
+		</div>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		background: var(--color-bg);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.bar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.5rem 1.5rem;
+		padding-block: 0.6rem;
+	}
+
+	nav {
+		order: 3;
+		flex-basis: 100%;
+	}
+
+	.toggle {
+		margin-left: auto;
+	}
+
+	ul {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	nav a {
+		display: inline-block;
+		padding: 0.4rem 0.45rem;
+		border-radius: 0.375rem;
+		color: var(--color-text);
+		text-decoration: none;
+		font-weight: 500;
+		font-size: 0.95rem;
+	}
+
+	nav a:hover {
+		background: var(--color-surface);
+		color: var(--color-accent);
+	}
+
+	nav a[aria-current='page'] {
+		color: var(--color-accent);
+		box-shadow: inset 0 -2px 0 var(--color-accent);
+		border-radius: 0.375rem 0.375rem 0 0;
+	}
+
+	ul {
+		margin-left: -0.45rem;
+	}
+
+	@media (min-width: 48rem) {
+		/* Sticky only where it doesn't eat the screen (on phones the nav wraps to its own row). */
+		.site-header {
+			position: sticky;
+			top: 0;
+			z-index: 10;
+		}
+
+		ul {
+			margin-left: 0;
+		}
+
+		nav a {
+			padding-inline: 0.6rem;
+		}
+
+		nav {
+			order: 0;
+			flex-basis: auto;
+		}
+
+		.bar {
+			flex-wrap: nowrap;
+		}
+	}
+</style>

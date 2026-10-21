@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Library from '../components/Library.astro';
+import PracticeLookup from '../components/PracticeLookup.astro';
+import { getLibrary } from '../lib/documents';
+
+const practiceDocs = await getLibrary('practice-info');
+---
+
+<BaseLayout title="Business Leaders" description="Practice information for Cloud Telephony business leaders.">
+	<div class="container page-header">
+		<h1>Business Leaders</h1>
+		<p>Look up a practice by phone number, and find practice-related documents.</p>
+	</div>
+
+	<section class="container section" id="practice-info" aria-labelledby="practice-info-heading">
+		<h2 class="section-heading" id="practice-info-heading">
+			Practice Information <a class="anchor-link" href="#practice-info" aria-label="Link to Practice Information">#</a>
+		</h2>
+
+		<PracticeLookup />
+
+		<h3 class="library-heading">Practice documents</h3>
+		<Library id="practice-info" label="Practice documents" docs={practiceDocs} headingLevel={4} />
+	</section>
+</BaseLayout>

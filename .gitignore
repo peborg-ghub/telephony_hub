@@ -1,0 +1,23 @@
+# build output
+dist/
+# generated types and content cache
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment variables
+.env
+.env.*
+
+# Netlify CLI
+.netlify/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/

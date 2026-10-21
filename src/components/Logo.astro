@@ -1,0 +1,33 @@
+---
+// To use an image logo instead of text, put the file in public/ (e.g. public/logo.svg)
+// and replace the <span> below with:
+//   <img src="/logo.svg" alt="Cloud Telephony" height="32" />
+import { SITE_NAME } from '../lib/site';
+---
+
+<a href="/" class="logo">
+	<span>{SITE_NAME}</span>
+</a>
+
+<style>
+	.logo {
+		display: inline-flex;
+		align-items: center;
+		font-weight: 700;
+		font-size: 1.15rem;
+		letter-spacing: -0.01em;
+		color: var(--color-text);
+		text-decoration: none;
+		white-space: nowrap;
+	}
+
+	.logo:hover {
+		color: var(--color-accent);
+	}
+
+	.logo :global(img) {
+		display: block;
+		height: 2rem;
+		width: auto;
+	}
+</style>
