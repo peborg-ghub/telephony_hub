@@ -58,7 +58,7 @@
   description: "Test results spreadsheet."
   section: ai-projects
   subsection: soundhound
-  file: ai-projects/soundhound/soundhound_intent_test_results.csv
+  file: ai-projects/soundhound/soundhound_intent_test_results.pdf
   dateAdded: 2026-10-25
   tags: [testing, intents]
 
