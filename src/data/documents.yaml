@@ -23,21 +23,21 @@
 
 # ── Practice Information (Business Leaders page) ───────────────────────────
 
-- title: "SAMPLE – Practice Onboarding Checklist"
+- title: "Practice Onboarding Checklist"
   description: "Steps for bringing a new practice onto the Cloud Telephony platform."
   section: practice-info
   file: practice-info/sample-onboarding-checklist.pdf
   dateAdded: 2026-10-14
   tags: [onboarding, checklist]
 
-- title: "SAMPLE – Practice Phone Directory"
+- title: "Practice Phone Directory"
   description: "Main numbers for each practice, with notes."
   section: practice-info
   file: practice-info/sample-phone-directory.csv
   dateAdded: 2026-10-02
   tags: [directory, phone-numbers]
 
-- title: "SAMPLE – After-Hours Routing Policy"
+- title: "After-Hours Routing Policy"
   description: "How calls are routed when a practice is closed."
   section: practice-info
   file: practice-info/sample-after-hours-routing.pdf
@@ -54,40 +54,40 @@
   dateAdded: 2026-10-25
   tags: [pilot, overview]
 
-- title: "SAMPLE – SoundHound Intent Test Results"
-  description: "Placeholder test results spreadsheet."
+- title: "SoundHound Intent Test Results"
+  description: "Test results spreadsheet."
   section: ai-projects
   subsection: soundhound
-  file: ai-projects/soundhound/sample-intent-test-results.csv
-  dateAdded: 2026-09-30
+  file: ai-projects/soundhound/soundhound_intent_test_results.csv
+  dateAdded: 2026-10-25
   tags: [testing, intents]
 
-- title: "SAMPLE – Sierra Kickoff Notes"
-  description: "Placeholder notes document for the Sierra subsection."
+- title: "Sierra Kickoff Notes"
+  description: "Notes document for the Sierra subsection."
   section: ai-projects
   subsection: sierra
-  file: ai-projects/sierra/sample-kickoff-notes.pdf
+  file: ai-projects/sierra/sierra_fictional_cloud_telephony_concept.pdf
   dateAdded: 2026-10-08
   owner: "Cloud Telephony"
   tags: [kickoff, notes]
 
 # ── Power BI (Internal Engineers page) ─────────────────────────────────────
 
-- title: "SAMPLE – Q3 Call Volume Summary"
+- title: "Q3 Call Volume Summary"
   description: "Monthly call volume by practice, July–September."
   section: power-bi
   file: power-bi/sample-q3-call-volume.pdf
   dateAdded: 2026-10-20
   tags: [Reporting, "Call Volume"]
 
-- title: "SAMPLE – Abandon Rate by Practice"
+- title: "Abandon Rate by Practice"
   description: "Abandoned-call rate per practice by month."
   section: power-bi
   file: power-bi/sample-abandon-rate.csv
   dateAdded: 2026-10-10
   tags: [reporting, abandon-rate]
 
-- title: "SAMPLE – Call Volume Tracker"
+- title: "Call Volume Tracker"
   description: "Example link card pointing to an external spreadsheet."
   section: power-bi
   url: https://example.com/
