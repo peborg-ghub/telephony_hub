@@ -46,12 +46,12 @@
 
 # ── AI Projects (Internal Engineers page) ──────────────────────────────────
 
-- title: "SAMPLE – SoundHound Pilot Overview"
-  description: "Placeholder overview document for the SoundHound subsection."
+- title: "SoundHound Kick Off"
+  description: "overview document for the SoundHound subsection."
   section: ai-projects
   subsection: soundhound
-  file: ai-projects/soundhound/sample-pilot-overview.pdf
-  dateAdded: 2026-10-16
+  file: ai-projects/soundhound/soundhound_telephony_ai_kickoff.pdf
+  dateAdded: 2026-10-25
   tags: [pilot, overview]
 
 - title: "SAMPLE – SoundHound Intent Test Results"
