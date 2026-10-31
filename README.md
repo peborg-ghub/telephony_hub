@@ -5,7 +5,7 @@ A static website for the Cloud Telephony team, built with [Astro](https://astro.
 | Page | URL | What's on it |
 |---|---|---|
 | Home | `/` | Links to both audiences and the 5 most recently added documents |
-| Business Leaders | `/business-leaders/` | Practice lookup and Practice Information documents |
+| Business Leaders | `/business-leaders/` | Practice lookup, new practice form and Practice Information documents |
 | Internal Engineers | `/internal-engineers/` | AI Projects (SoundHound, Sierra, IVA Studio) and Power BI |
 
 You update the site by editing two data files and dropping documents into folders. When you push to GitHub, Netlify rebuilds the site automatically. **If you make a mistake, the build stops and tells you what's wrong**, so a broken site never goes live.
@@ -211,7 +211,7 @@ The practice lookup on the Business Leaders page reads `src/data/practices.csv`.
 ### Columns (the header row must be exactly this)
 
 ```
-number,practice_name,address_line1,address_line2,city,state,zip,mon,tue,wed,thu,fri,sat,sun,timezone,notes
+number,practice_name,address_line1,address_line2,city,state,zip,mon,tue,wed,thu,fri,sat,sun,timezone,notes,date_added,date_modified
 ```
 
 | Column | Notes |
@@ -222,13 +222,15 @@ number,practice_name,address_line1,address_line2,city,state,zip,mon,tue,wed,thu,
 | `mon` … `sun` | Free text, e.g. `8:00 AM – 5:00 PM` or `Closed`. An empty cell shows as "Not listed". |
 | `timezone` | Required. A time zone name: `America/New_York` (Eastern), `America/Chicago` (Central), `America/Denver` (Mountain), `America/Phoenix` (Arizona), `America/Los_Angeles` (Pacific). It decides which day is highlighted as "Today". |
 | `notes` | Optional. Shown under the hours. |
+| `date_added` | Required. `YYYY-MM-DD`, e.g. `2026-10-31`. The day the practice was added. `/api/practices` lists newest first. |
+| `date_modified` | Optional. `YYYY-MM-DD`. **When you change a row, set this to the day you changed it.** Leave it empty for rows that haven't changed. It can't be earlier than `date_added`. `/api/summary` uses it to list this week's changes. |
 
 **A practice with several phone numbers gets one row per number.** Repeat the rest of the row.
 
 ### Sample row
 
 ```
-8135550101,Bayside Family Dental,100 Main Street,Suite 200,Tampa,FL,33602,8:00 AM – 5:00 PM,8:00 AM – 5:00 PM,8:00 AM – 5:00 PM,8:00 AM – 5:00 PM,8:00 AM – 3:00 PM,Closed,Closed,America/New_York,Lunch 12–1
+8135550101,Bayside Family Dental,100 Main Street,Suite 200,Tampa,FL,33602,8:00 AM – 5:00 PM,8:00 AM – 5:00 PM,8:00 AM – 5:00 PM,8:00 AM – 5:00 PM,8:00 AM – 3:00 PM,Closed,Closed,America/New_York,Lunch 12–1,2026-10-31,
 ```
 
 **If a value contains a comma, wrap it in double quotes:** `"Closed Wednesdays, lunch 12–1"`.
@@ -241,6 +243,70 @@ Excel works, but watch for two things:
 2. **Save as "CSV UTF-8 (Comma delimited)"**, not plain "CSV". Plain CSV can mangle characters like the en dash in `8:00 AM – 5:00 PM`.
 
 Then run `npm run build`. Bad rows are reported with their line number.
+
+### Practices added through the form
+
+Business leaders can add a practice with the **Add a New Practice** form on the Business Leaders page (`/business-leaders/#new-practice`). **It appears in the lookup straight away**, with no build or push. Each submission is saved as a new row (one per phone number) in **`entries.csv`**, not in `practices.csv`. `entries.csv` has the same columns as `practices.csv`, plus `submitted_by`, `email` and `submitted_at`. It lives in **Netlify Blobs** (a store called `practices`) because the live site can't change its own files. **Download it any time from `/api/export`.**
+
+**One-time setup: the team passcode.** The form only accepts submissions with the team passcode, so strangers who find the URL can't add practices.
+
+1. In Netlify, go to **Site configuration → Environment variables → Add a variable**. Key: `PRACTICE_FORM_PASSCODE`. Value: a passcode you share with business leaders. Scopes: **Functions**.
+2. Redeploy (**Deploys → Trigger deploy**). Until you do, the form says it isn't set up yet.
+3. **To change the passcode**, edit the variable and redeploy.
+
+For `npm run dev`, the passcode is in `.env` in the project folder (`PRACTICE_FORM_PASSCODE=…`). Git ignores that file, so it never leaves your computer. Practices you add locally go into a local `entries.csv` under `.netlify/blobs-serve/` and never reach the live site.
+
+**Rules the form enforces:** a number already in `practices.csv` or already added through the form is rejected. If a number is in both places, `practices.csv` wins.
+
+**Moving added practices into the CSV (optional, e.g. for a backup or to edit one):** open `https://YOUR-SITE.netlify.app/api/practices/added?format=csv`. It lists every added practice as `practices.csv` rows (without the submitter columns). Paste the ones you want into `practices.csv` and push. Once a number is in the CSV, the CSV version is shown.
+
+**Fixing or removing an added practice:** in Netlify, open **Blobs** (under your site), choose the `practices` store and open `entries.csv`. You can download it, edit the row (or delete it, keeping the header row), and upload it again. Or add the corrected row to `practices.csv`, which wins over `entries.csv`.
+
+### Practice data as JSON
+
+Two read-only endpoints return practice data:
+
+| URL | Returns |
+|---|---|
+| `GET /api/practices` | Every practice in `practices.csv`, **newest `date_added` first** (practices with the same date: lower in the file first). The CSV is read as of the last deploy. Practices added through the form aren't included. |
+| `GET /api/summary` | The last 7 days (today and the 6 days before, Eastern Time): practices in `practices.csv` **added** that week (by `date_added`) and practices **modified** that week (by `date_modified`), each newest first. A practice added and changed in the same week is listed under `added` only. |
+| `POST /api/practices` | Used by the form. Validates the submission and the team passcode, appends the practice to `entries.csv`, and returns `201` with `entries` (the rows exactly as saved, one per phone number) and `practices` (the same data in the lookup's shape). Errors return `{ "problems": [...] }` with `400` (invalid), `403` (wrong passcode), `409` (number already in the lookup) or `503` (passcode not set up). |
+| `GET /api/export` | **Downloads every form submission as `entries-YYYY-MM-DD.csv`** (today's date). Opens cleanly in Excel, including the – in hours. |
+| `GET /api/entries.csv` | Downloads `entries.csv`: every form submission, with who sent it and when. |
+| `GET /api/practices/added` | Practices added through the form, keyed by phone number. The lookup uses this. Add `?format=csv` for CSV rows. |
+
+Each item from `/api/practices` has the same fields the lookup card shows, plus `number` and `dateAdded`:
+
+```json
+[
+  {
+    "number": "8135556789",
+    "name": "Family Medicine at Tampa",
+    "address": ["123 Health Ave", "200", "Tampa, FL 33573"],
+    "hours": ["8:00 AM – 5:00 PM", "…Monday to Sunday…", "Closed"],
+    "tz": "America/New_York",
+    "notes": "Closed during lunch from 12PM to 1PM",
+    "dateAdded": "2026-10-31"
+  }
+]
+```
+
+Items also have `dateModified` when the row has a `date_modified`. `/api/summary` returns:
+
+```json
+{
+  "from": "2026-10-25",
+  "to": "2026-10-31",
+  "timezone": "America/New_York",
+  "counts": { "added": 1, "modified": 1 },
+  "added": [ { "number": "8135556789", "name": "…", "dateAdded": "2026-10-31", "…": "same fields as above" } ],
+  "modified": [ { "number": "8135550101", "name": "…", "dateAdded": "2026-09-01", "dateModified": "2026-10-28", "…": "…" } ]
+}
+```
+
+Like `/api/practices`, it reads `practices.csv` as of the last deploy, but works out "this week" each time it's called.
+
+`notes` is left out when it's empty. An empty day in `hours` is `""` (the lookup shows it as "Not listed").
 
 ### The sample rows
 
@@ -358,7 +424,9 @@ Errors name the entry by its position in the file and its title, e.g. `#7 Q3 Cal
 | `line N: practice_name is empty` | No name. | Fill it in. |
 | `line N: timezone "…" isn't recognised` / `timezone is empty` | e.g. `Eastern` or `EST`. | Use `America/New_York`, `America/Chicago`, etc. |
 | `line 1: the header row must be exactly: …` | A column was renamed, removed, added or moved. The error lists what's missing or unexpected. | Restore the header row from [section 4](#4-update-practice-data). |
-| `line N: Invalid Record Length: columns length is 16, got 17` | That row has an extra (or missing) comma. | Usually a comma inside a value: wrap the value in "double quotes". |
+| `line N: date_added is empty` / `date_added "…" must be a real date` | Missing, written another way (e.g. `10/31/2026`), or a date that doesn't exist (e.g. `2026-02-30`). | Write it as `2026-10-31`. In Excel, format the column as Text so it isn't reformatted. |
+| `line N: date_modified … is before date_added …` / `date_modified "…" must be a real date` | The change date is earlier than the added date, or written another way. | Write it as `2026-10-31`, or leave it empty if the row hasn't changed. |
+| `line N: Invalid Record Length: columns length is 18, got 19` | That row has an extra (or missing) comma. | Usually a comma inside a value: wrap the value in "double quotes". |
 
 ### Files and colors
 
@@ -388,5 +456,6 @@ src/
   lib/                 ← validation and data loading
 scripts/               ← pre-build checks (file sizes, colors)
 netlify.toml           ← Netlify build settings and the noindex header
+.env                   ← local passcode for the Add a New Practice form (not in Git)
 DECISIONS.md           ← why things were built the way they are
 ```

@@ -145,6 +145,21 @@ const json = JSON.stringify(practices).replace(/</g, '\\u003c');
 			input.setAttribute('aria-invalid', String(isError));
 		}
 
+		// Practices added through the Add a New Practice form since the last deploy.
+		// practices.csv wins if a number is in both.
+		const merge = (added: Record<string, Practice>) => {
+			for (const [number, p] of Object.entries(added)) data[number] ??= p;
+		};
+		fetch('/api/practices/added')
+			.then((r) => (r.ok ? r.json() : {}))
+			.then(merge)
+			.catch(() => {});
+		document.addEventListener('practices:added', (e) => merge((e as CustomEvent<Record<string, Practice>>).detail));
+		document.addEventListener('practices:lookup', (e) => {
+			input.value = pretty((e as CustomEvent<string>).detail);
+			form.requestSubmit();
+		});
+
 		form.addEventListener('submit', (e) => {
 			e.preventDefault();
 			result.replaceChildren();

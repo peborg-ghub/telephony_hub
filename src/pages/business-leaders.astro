@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Library from '../components/Library.astro';
+import NewPracticeForm from '../components/NewPracticeForm.astro';
 import PracticeLookup from '../components/PracticeLookup.astro';
 import { getLibrary } from '../lib/documents';
 
@@ -10,7 +11,7 @@ const practiceDocs = await getLibrary('practice-info');
 <BaseLayout title="Business Leaders" description="Practice information for Cloud Telephony business leaders.">
 	<div class="container page-header">
 		<h1>Business Leaders</h1>
-		<p>Look up a practice by phone number, and find practice-related documents.</p>
+		<p>Look up a practice by phone number, add a new practice, and find practice-related documents.</p>
 	</div>
 
 	<section class="container section" id="practice-info" aria-labelledby="practice-info-heading">
@@ -20,7 +21,35 @@ const practiceDocs = await getLibrary('practice-info');
 
 		<PracticeLookup />
 
+		<p class="new-practice-link">
+			Practice not listed? <a href="#new-practice">Add a new practice</a>
+		</p>
+
 		<h3 class="library-heading">Practice documents</h3>
 		<Library id="practice-info" label="Practice documents" docs={practiceDocs} headingLevel={4} />
 	</section>
+
+	<section class="container section" id="new-practice" aria-labelledby="new-practice-heading">
+		<h2 class="section-heading" id="new-practice-heading">
+			Add a New Practice <a class="anchor-link" href="#new-practice" aria-label="Link to Add a New Practice">#</a>
+		</h2>
+		<p class="intro">
+			Fill in the practice's details below. As soon as you submit, the practice appears in the practice lookup
+			above. You'll need the team passcode.
+		</p>
+
+		<NewPracticeForm />
+	</section>
 </BaseLayout>
+
+<style>
+	.new-practice-link {
+		margin-top: -1rem;
+		margin-bottom: 2rem;
+	}
+
+	.intro {
+		max-width: 44rem;
+		color: var(--color-text-muted);
+	}
+</style>

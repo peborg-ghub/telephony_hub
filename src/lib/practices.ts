@@ -15,10 +15,12 @@ export const COLUMNS = [
 	...DAYS,
 	'timezone',
 	'notes',
+	'date_added',
+	'date_modified',
 ] as const;
 
 type Column = (typeof COLUMNS)[number];
-type Row = Record<Column, string>;
+export type Row = Record<Column, string>;
 
 /** What the browser receives for one phone number. Kept short to keep the page small. */
 export interface Practice {
@@ -30,7 +32,7 @@ export interface Practice {
 	notes?: string;
 }
 
-function isValidTimeZone(tz: string): boolean {
+export function isValidTimeZone(tz: string): boolean {
 	try {
 		new Intl.DateTimeFormat('en-US', { timeZone: tz });
 		return true;
@@ -39,7 +41,7 @@ function isValidTimeZone(tz: string): boolean {
 	}
 }
 
-function toPractice(row: Row): Practice {
+export function toPractice(row: Row): Practice {
 	const cityLine = [row.city, [row.state, row.zip].filter(Boolean).join(' ')].filter(Boolean).join(', ');
 	return {
 		name: row.practice_name,
@@ -50,12 +52,47 @@ function toPractice(row: Row): Practice {
 	};
 }
 
+/** One practice in the API lists: the lookup card's fields plus its number and dates. */
+export interface PracticeListItem extends Practice {
+	number: string;
+	/** YYYY-MM-DD, from the date_added column. */
+	dateAdded: string;
+	/** YYYY-MM-DD, from the date_modified column. Left out if the row was never modified. */
+	dateModified?: string;
+}
+
+export function toListItem(row: Row): PracticeListItem {
+	return {
+		number: row.number,
+		...toPractice(row),
+		dateAdded: row.date_added,
+		...(row.date_modified ? { dateModified: row.date_modified } : {}),
+	};
+}
+
+/** True for a real calendar date written as YYYY-MM-DD. */
+export function isIsoDate(value: string): boolean {
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+	const d = new Date(`${value}T00:00:00Z`);
+	return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === value;
+}
+
 /**
  * Reads and validates practices.csv. Throws (failing the build) with every problem found,
  * each tagged with its CSV line number. Returns a map of 10-digit number → practice.
+ * (The lookup only needs number → practice; date_added is for the /api/practices list.)
  */
 export function loadPractices(): Record<string, Practice> {
-	const text = readFileSync(PRACTICES_FILE, 'utf8');
+	return parsePractices(readFileSync(PRACTICES_FILE, 'utf8'));
+}
+
+/** Validates the text of practices.csv. Used directly by the server, which has no file system. */
+export function parsePractices(text: string): Record<string, Practice> {
+	return Object.fromEntries(parsePracticeRows(text).map((row) => [row.number, toPractice(row)]));
+}
+
+/** Validates the text of practices.csv and returns its rows in file order. Throws listing every problem. */
+export function parsePracticeRows(text: string): Row[] {
 	const problems: string[] = [];
 	let records: { record: Row; info: { lines: number } }[];
 
@@ -90,7 +127,6 @@ export function loadPractices(): Record<string, Practice> {
 		throw new Error(`Problem in ${PRACTICES_FILE}:\n  - ${where}${err.message}${hint}\n`);
 	}
 
-	const practices: Record<string, Practice> = {};
 	const firstSeen = new Map<string, number>();
 
 	for (const { record, info } of records) {
@@ -117,11 +153,26 @@ export function loadPractices(): Record<string, Practice> {
 			);
 		}
 
-		practices[number] = toPractice(record);
+		if (!record.date_added) {
+			problems.push(`line ${line}: date_added is empty (use YYYY-MM-DD, e.g. 2026-10-31)`);
+		} else if (!isIsoDate(record.date_added)) {
+			problems.push(`line ${line}: date_added "${record.date_added}" must be a real date written YYYY-MM-DD, e.g. 2026-10-31`);
+		}
+
+		// Optional: blank until the row is edited after it was added.
+		if (record.date_modified) {
+			if (!isIsoDate(record.date_modified)) {
+				problems.push(
+					`line ${line}: date_modified "${record.date_modified}" must be a real date written YYYY-MM-DD, or left empty`,
+				);
+			} else if (isIsoDate(record.date_added) && record.date_modified < record.date_added) {
+				problems.push(`line ${line}: date_modified ${record.date_modified} is before date_added ${record.date_added}`);
+			}
+		}
 	}
 
 	if (problems.length) {
 		throw new Error(`Problem(s) in ${PRACTICES_FILE}:\n  - ${problems.join('\n  - ')}\n`);
 	}
-	return practices;
+	return records.map((r) => r.record);
 }
