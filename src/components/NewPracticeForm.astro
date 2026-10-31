@@ -87,8 +87,8 @@ const existing = JSON.stringify(Object.keys(loadPractices()));
 	</fieldset>
 
 	<fieldset>
-		<legend>Hours of operation</legend>
-		<p class="hint">Leave a day blank if you don't know it. Put lunch breaks in the notes.</p>
+		<legend>Hours of operation <span class="req">(required)</span></legend>
+		<p class="hint">Enter opening and closing times for every day, or tick "Closed all day". Put lunch breaks in the notes.</p>
 		<table class="np-hours">
 			<thead>
 				<tr>
@@ -276,10 +276,10 @@ const existing = JSON.stringify(Object.keys(loadPractices()));
 				const open = row.querySelector<HTMLInputElement>('[data-np-open]')!;
 				const close = row.querySelector<HTMLInputElement>('[data-np-close]')!;
 				if (row.querySelector<HTMLInputElement>('[data-np-closed]')!.checked) return 'Closed';
-				if (!open.value && !close.value) return '';
 				open.id ||= `np-${row.dataset.npDay}-open`;
 				close.id ||= `np-${row.dataset.npDay}-close`;
-				if (!open.value) fail(open, `${day}: enter an opening time, or tick "Closed all day".`);
+				if (!open.value && !close.value) fail(open, `${day}: enter opening and closing times, or tick "Closed all day".`);
+				else if (!open.value) fail(open, `${day}: enter an opening time, or tick "Closed all day".`);
 				else if (!close.value) fail(close, `${day}: enter a closing time, or tick "Closed all day".`);
 				else if (close.value <= open.value) fail(close, `${day}: closing time must be after opening time.`);
 				return open.value && close.value ? `${to12h(open.value)} – ${to12h(close.value)}` : '';

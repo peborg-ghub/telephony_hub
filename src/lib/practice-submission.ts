@@ -47,6 +47,11 @@ export function normalizeNumber(value: string): string {
 	return digits.length === 11 && digits.startsWith('1') ? digits.slice(1) : digits;
 }
 
+const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+/** One day's hours, in the format the form produces: "8:00 AM – 5:00 PM" (en dash) or "Closed". */
+const HOURS = /^(Closed|(1[0-2]|[1-9]):[0-5]\d (AM|PM) – (1[0-2]|[1-9]):[0-5]\d (AM|PM))$/;
+
 /** Characters a phone number may be typed with: digits plus ( ) - . + and spaces. */
 const PHONE_CHARS = /^[\d\s().+-]+$/;
 
@@ -113,7 +118,16 @@ export function validateSubmission(
 	if (s.state && !/^[A-Z]{2}$/.test(s.state)) problems.push('State should be 2 letters, e.g. FL.');
 	if (s.zip && !/^\d{5}(-\d{4})?$/.test(s.zip)) problems.push('ZIP should be 5 digits, e.g. 33602.');
 	if (!s.timezone || !isValidTimeZone(s.timezone)) problems.push('Choose a time zone.');
-	if (s.hours.length !== DAYS.length || s.hours.some((h) => h.length > 40)) problems.push('Hours of operation are invalid.');
+	if (s.hours.length !== DAYS.length) {
+		problems.push('Hours of operation are required for all 7 days.');
+	} else {
+		const missing = DAY_NAMES.filter((_, i) => !s.hours[i]);
+		const malformed = DAY_NAMES.filter((_, i) => s.hours[i] && !HOURS.test(s.hours[i]));
+		if (missing.length) problems.push(`Enter hours, or "Closed", for: ${missing.join(', ')}.`);
+		if (malformed.length) {
+			problems.push(`Hours must look like "8:00 AM – 5:00 PM" or "Closed" for: ${malformed.join(', ')}.`);
+		}
+	}
 	if (!s.submitted_by) problems.push('Enter your name.');
 	if (s.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.email)) problems.push('Enter a valid email address, or leave it blank.');
 	for (const [key, max] of Object.entries(LIMITS)) {
